@@ -22,6 +22,9 @@ module.exports = function (config){
   const expires = Number(config.expires || 0);
   const debug = config.debug
 
+  //按先后排序的stack;
+  var dataKeyStack = [];
+
   return function *(next){
     if(testReg) {
 
@@ -34,13 +37,33 @@ module.exports = function (config){
 
       var now = Date.now();
 
+      var expired = isExpired(cacheExpiredTime, now, expires);
+
+
+      //清理过期数据
+      if(expired){
+        var i = dataKeyStack.indexOf(dataKey);
+
+        if(i>0){
+          dataKeyStack.slice(0,i+1).map(expiredDataKey=>{
+
+            var expiredExpireKey = getExpireKey(expiredDataKey);
+
+            cache.delete(expiredDataKey);
+            cache.delete(expiredExpireKey);
+          });
+          dataKeyStack = dataKeyStack.slice(i+1);
+        }
+      }else{
+        dataKeyStack.push(dataKey);
+      }
       //console.log(cacheData);
       //console.log(cacheExpiredTime)
       //console.log(now);
       //console.log(expires);
       //console.log('------');
 
-      if (cacheData && !isExpired(cacheExpiredTime, now, expires)) {
+      if (cacheData && !expired) {
 
         console.log(`${dataKey} cache`);
 
