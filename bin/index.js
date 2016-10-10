@@ -46,7 +46,7 @@ module.exports = function (config){
 
         this.body = cacheData;
       } else {
-        //
+
         yield next;
 
         if (testReg.test(this.url)) {
