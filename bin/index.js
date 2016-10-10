@@ -40,11 +40,18 @@ module.exports = function (config){
       var expired = isExpired(cacheExpiredTime, now, expires);
 
 
+      //console.log('cache.length',cache.size,dataKeyStack.length);
+      //console.log(cacheData);
+      //console.log(cacheExpiredTime)
+      //console.log(now);
+      //console.log(expires);
+      //console.log('------');
+
       //清理过期数据
       if(expired){
         var i = dataKeyStack.indexOf(dataKey);
 
-        if(i>0){
+        if(i>=0){
           dataKeyStack.slice(0,i+1).map(expiredDataKey=>{
 
             var expiredExpireKey = getExpireKey(expiredDataKey);
@@ -54,14 +61,7 @@ module.exports = function (config){
           });
           dataKeyStack = dataKeyStack.slice(i+1);
         }
-      }else{
-        dataKeyStack.push(dataKey);
       }
-      //console.log(cacheData);
-      //console.log(cacheExpiredTime)
-      //console.log(now);
-      //console.log(expires);
-      //console.log('------');
 
       if (cacheData && !expired) {
 
@@ -76,6 +76,7 @@ module.exports = function (config){
 
           cache.set(dataKey, this.body);
           cache.set(expireKey, now);
+          dataKeyStack.push(dataKey);
         }
       }
     }else{

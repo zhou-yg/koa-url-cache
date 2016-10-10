@@ -15,8 +15,6 @@ app.use(myMiddleWare({
 app.use(function *() {
 
 
-  console.log(this.request);
-
   this.body = '成功'+(i++)
 });
 
