@@ -1,9 +1,9 @@
 {
-  "name": "d",
+  "name": "koa-url-cache",
   "version": "0.0.1",
   "description": "d",
   "keywords": [
-    "user-auth",
+    "koa-url-cache",
     "koa",
     "koa2.0"
   ],
