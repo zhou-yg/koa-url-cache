@@ -20,14 +20,17 @@ function urlCache(config){
 
   const testReg = config.test;
   const expires = Number(config.expires || 0);
-  const debug = config.debug
+  const debug = config.debug;
+  const myCache = config.cache;
 
   //按先后排序的stack;
   var dataKeyStack = [];
+  
+  var useCache = myCache || cache;
 
   return function *(next){
     if(!this.urlCache){
-      this.urlCache = cache;
+      this.urlCache = useCache;
     }
 
     if(testReg) {
@@ -36,15 +39,15 @@ function urlCache(config){
       var dataKey = this.url;
       var expireKey = getExpireKey(dataKey);
 
-      var cacheData = cache.get(dataKey);
-      var cacheExpiredTime = cache.get(expireKey);
+      var cacheData = useCache.get(dataKey);
+      var cacheExpiredTime = useCache.get(expireKey);
 
       var now = Date.now();
 
       var expired = isExpired(cacheExpiredTime, now, expires);
 
 
-      //console.log('cache.length',cache.size,dataKeyStack.length);
+      //console.log('useCache.length',useCache.size,dataKeyStack.length);
       //console.log(cacheData);
       //console.log(cacheExpiredTime)
       //console.log(now);
@@ -60,8 +63,8 @@ function urlCache(config){
 
             var expiredExpireKey = getExpireKey(expiredDataKey);
 
-            cache.delete(expiredDataKey);
-            cache.delete(expiredExpireKey);
+            useCache.delete(expiredDataKey);
+            useCache.delete(expiredExpireKey);
           });
           dataKeyStack = dataKeyStack.slice(i+1);
         }
@@ -78,8 +81,8 @@ function urlCache(config){
 
         if (testReg.test(this.url)) {
 
-          cache.set(dataKey, this.body);
-          cache.set(expireKey, now);
+          useCache.set(dataKey, this.body);
+          useCache.set(expireKey, now);
           dataKeyStack.push(dataKey);
         }
       }
@@ -88,7 +91,5 @@ function urlCache(config){
     }
   }
 }
-
-urlCache.cache = cache;
 
 module.exports = urlCache;
