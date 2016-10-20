@@ -16,7 +16,7 @@ function getExpireKey(key){
  *    expires:缓存过期时间
  * @returns {Function}
  */
-module.exports = function (config){
+function urlCache(config){
 
   const testReg = config.test;
   const expires = Number(config.expires || 0);
@@ -26,6 +26,10 @@ module.exports = function (config){
   var dataKeyStack = [];
 
   return function *(next){
+    if(!this.urlCache){
+      this.urlCache = cache;
+    }
+
     if(testReg) {
 
 
@@ -83,4 +87,8 @@ module.exports = function (config){
       yield next;
     }
   }
-};
+}
+
+urlCache.cache = cache;
+
+module.exports = urlCache;
